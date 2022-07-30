@@ -6,9 +6,7 @@ import (
 	"net/http"
 )
 
-/*
-	发送私聊消息
-*/
+// 发送私聊消息
 func SendPrivateMsg(uid int64, gid int64, message string, auto bool) {
 	msg := struct {
 		Uid     int64  `json:"user_id"`
@@ -24,10 +22,14 @@ func SendPrivateMsg(uid int64, gid int64, message string, auto bool) {
 
 	payload, _ := json.Marshal(&msg)
 
-	http.Post("http://localhost:5700/send_private_msg", "application/json", bytes.NewReader(payload))
+	_, err := http.Post("http://localhost:5700/send_private_msg", "application/json", bytes.NewReader(payload))
+	if err != nil {
+		return
+	}
 
 }
 
+// SendGroupMsg 发送群聊消息
 func SendGroupMsg(gid int64, message string, auto bool) {
 	msg := struct {
 		Gid     int64  `json:"group_id"`
@@ -41,5 +43,8 @@ func SendGroupMsg(gid int64, message string, auto bool) {
 
 	payload, _ := json.Marshal(&msg)
 
-	http.Post("http://localhost:5700/send_group_msg", "application/json", bytes.NewReader(payload))
+	_, err := http.Post("http://localhost:5700/send_group_msg", "application/json", bytes.NewReader(payload))
+	if err != nil {
+		return
+	}
 }

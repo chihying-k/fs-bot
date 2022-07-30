@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 	"go_cqhttp_demo/api"
+	"go_cqhttp_demo/util"
 	"io/ioutil"
-	"regexp"
 )
 
 func main() {
@@ -31,8 +31,8 @@ func main() {
 			fmt.Println("发送者信息：" + sender)
 
 			// 权限群组
-			isadmin := gjson.Get(string(rawData), "role").String()
-			fmt.Println("权限群组：" + isadmin)
+			role := gjson.Get(sender, "role").String()
+			fmt.Println("权限群组：" + role)
 
 			// 发送者QQ号
 			// qq := gjson.Get(sender, "user_id").String()
@@ -41,36 +41,33 @@ func main() {
 				api.SendGroupMsg(gid, "0", false)
 			}
 
-			if message == "来一张" {
+			if util.SetuIdentifyKeywords(message) {
 				msg := "请稍后。。。"
 				api.SendGroupMsg(gid, msg, false)
+
 				c.JSON(200, gin.H{
 					"reply":     "[CQ:image,file=" + api.GetSetu() + ",id=40000]",
 					"at_sender": true,
 				})
 			}
 
-		}
+			if util.BanIdentifyKeywords(message) {
+				c.JSON(200, gin.H{
+					"reply":     "您发送的是ban命令",
+					"at_sender": true,
+				})
+			}
 
-		if banC(postType) {
-			c.JSON(200, gin.H{
-				"reply":     "您的命令正确",
-				"at_sender": true,
-			})
-		} else {
-			c.JSON(200, gin.H{
-				"reply":     "您的命令不正确",
-				"at_sender": true,
-			})
+			if util.FindPermissionIdentifyKeywords(message) {
+				c.JSON(200, gin.H{
+					"reply":     "您的权限组：" + role,
+					"at_sender": true,
+				})
+			}
+
 		}
 
 	})
 
 	r.Run(":8081")
-}
-
-func banC(message string) bool {
-	// 正则表达式判断是否符合
-	matched, _ := regexp.MatchString("^.[a-n]+\\s+[0-9]*\\s+[0-9]*$", message)
-	return matched
 }
