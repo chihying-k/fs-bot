@@ -1,5 +1,5 @@
 # fsbot
 
-基于go-sqhttp
+需要go-cqhttp为基础
 
 
