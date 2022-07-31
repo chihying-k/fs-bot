@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// GetSetu 涩图获取API
+// GetSetu 涩图获取
 func GetSetu() string {
 	// API请求
 	get, _ := http.Get("https://i.fs233.cc/setu?type=json")
